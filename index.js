@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 
@@ -10,13 +11,24 @@ app.use(cors()); // Enable CORS
 app.use(bodyParser.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MongoURI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
 
 // Flexible Schema Setup
 const dynamicSchema = new mongoose.Schema({}, { strict: false });
 const DynamicModel = mongoose.model('Dynamic', dynamicSchema);
+
+// Start Server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
+app.get("/ping", (req, res) => {
+    res.send("pong");
+});
+
 
 // POST Endpoint
 app.post('/webhook', async (req, res) => {
@@ -31,9 +43,4 @@ app.post('/webhook', async (req, res) => {
     }
 });
 
-// Start Server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
 
